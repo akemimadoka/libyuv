@@ -8,6 +8,8 @@
 * Optimized for Neon on Arm.
 * Optimized for MSA on Mips.
 
+[![Download](https://api.bintray.com/packages/chino/Testing/libyuv%3AChino/images/download.svg?version=1735%3ATesting)](https://bintray.com/chino/Testing/libyuv%3AChino/1735%3ATesting/link)
+
 ### Development
 
 See [Getting started][1] for instructions on how to get started developing.
