@@ -20,6 +20,7 @@ endif()
 
 option(YUV_TEST "Build unit tests" OFF)
 option(YUV_TOOL "Build tools" OFF)
+option(YUV_WITH_JPEG_SUPPORT "With Jpeg support" ON)
 
 set(ly_base_dir ${CMAKE_CURRENT_SOURCE_DIR})
 set(ly_src_dir ${ly_base_dir}/source)
@@ -37,14 +38,24 @@ list(SORT ly_source_files)
 file(GLOB_RECURSE ly_unittest_sources ${ly_tst_dir}/*.cc)
 list(SORT ly_unittest_sources)
 
+string(REPLACE -Oz -O3 CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+
 add_library(${ly_lib} ${ly_inc_files} ${ly_source_files})
 target_include_directories(${ly_lib} PUBLIC
 	$<BUILD_INTERFACE:${ly_inc_dir}>
 	$<INSTALL_INTERFACE:include>)
-target_link_libraries(${ly_lib} PUBLIC
-	CONAN_PKG::libjpeg-turbo)
-target_compile_definitions(${ly_lib} PUBLIC
-	HAVE_JPEG)
+if (YUV_WITH_JPEG_SUPPORT)
+	target_link_libraries(${ly_lib} PUBLIC
+		CONAN_PKG::libjpeg-turbo)
+	target_compile_definitions(${ly_lib} PUBLIC
+		HAVE_JPEG)
+endif()
+
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "armv7-a")
+    target_compile_options(${ly_lib} PRIVATE -mfloat-abi=softfp -mfpu=neon)
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    target_compile_options(${ly_lib} PRIVATE -march=armv8-a)
+endif()
 
 # this creates the conversion tool
 if(YUV_TOOL)
